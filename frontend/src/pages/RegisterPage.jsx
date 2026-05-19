@@ -63,14 +63,17 @@ export default function RegisterPage() {
     <div className="login-root">
       <div className="login-grain" />
 
-      <div className="login-left">
-        <video
-          src="/13509218_3840_2160_60fps.mp4"
-          autoPlay muted loop playsInline
-          className="login-video"
-        />
-        <div className="login-video-overlay" />
-        <div className="login-left-content">
+      <div className="login-card">
+        {/* Left — branding + cinematic image */}
+        <div className="login-left">
+          <img
+            src="https://images.unsplash.com/photo-1466611653911-95282fc3656b?auto=format&fit=crop&w=1200&q=80"
+            className="login-video"
+            alt="Éoliennes"
+            crossOrigin="anonymous"
+          />
+          <div className="login-video-overlay" />
+          <div className="login-left-content">
             <Link to="/" className="login-logo">
               <div className="login-logo-icon">
                 <Zap size={18} className="text-indigo-600 fill-indigo-600" />
@@ -78,92 +81,87 @@ export default function RegisterPage() {
               <span className="login-logo-text">EnergyWatch — Surveillance IoT</span>
             </Link>
             <div className="login-left-bottom">
-            <h2 className="login-left-title">
-              Optimisez votre
-              <br />
-              empreinte carbone
-            </h2>
-            <p className="login-left-sub">
-              Rejoignez la révolution énergétique et pilotez votre consommation avec précision grâce à l'IA.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="login-right" ref={panelRef}>
-        <div className="login-form-wrap" ref={formRef}>
-          <div className="login-form-header">
-            <h1 className="login-form-title">Inscription</h1>
-            <p className="login-form-sub">
-              Créez un compte pour débuter votre optimisation
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="login-form">
-            <div className="login-field">
-              <label className="login-label">Nom complet</label>
-              <div className="login-input-wrap">
-                <Mail size={16} className="login-input-icon" />
-                <input
-                  type="text"
-                  placeholder="Votre nom"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="login-input"
-                  autoComplete="name"
-                />
-              </div>
+              <h2 className="login-left-title">
+                Optimisez votre
+                <br />
+                empreinte carbone
+              </h2>
+              <p className="login-left-sub">
+                Rejoignez la révolution énergétique et pilotez votre consommation avec précision grâce à l'IA.
+              </p>
             </div>
-
-            <div className="login-field">
-              <label className="login-label">Email</label>
-              <div className="login-input-wrap">
-                <Mail size={16} className="login-input-icon" />
-                <input
-                  type="email"
-                  placeholder="nom@entreprise.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="login-input"
-                  autoComplete="email"
-                />
-              </div>
-            </div>
-
-            <div className="login-field">
-              <label className="login-label">Mot de passe</label>
-              <div className="login-input-wrap">
-                <Lock size={16} className="login-input-icon" />
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="login-input"
-                  autoComplete="new-password"
-                />
-              </div>
-            </div>
-
-            {error && <div className="login-error">{error}</div>}
-
-            <button type="submit" className="login-submit" disabled={loading}>
-              {loading ? (
-                <span className="login-loader" />
-              ) : (
-                <>Créer mon compte <ArrowRight size={15} /></>
-              )}
-            </button>
-          </form>
-
-          <div className="login-footer-text">
-            Vous avez déjà un compte ?{' '}
-            <Link to="/login" className="login-link">Connectez-vous</Link>
           </div>
         </div>
 
-        <div className="login-bottom-note">
-          Projet PFE — ISRA 2025
+        {/* Right — form */}
+        <div className="login-right" ref={panelRef}>
+          <div className="login-form-wrap" ref={formRef}>
+            <div className="login-form-header">
+              <h1 className="login-form-title">Inscription</h1>
+              <p className="login-form-sub">Créez un compte pour débuter votre optimisation</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="login-form">
+              <div className="login-field">
+                <label className="login-label">Nom complet</label>
+                <div className="login-input-wrap">
+                  <Mail size={16} className="login-input-icon" />
+                  <input
+                    type="text"
+                    placeholder="Votre nom"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="login-input"
+                    autoComplete="name"
+                  />
+                </div>
+              </div>
+
+              <div className="login-field">
+                <label className="login-label">Email</label>
+                <div className="login-input-wrap">
+                  <Mail size={16} className="login-input-icon" />
+                  <input
+                    type="email"
+                    placeholder="nom@entreprise.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="login-input"
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+
+              <div className="login-field">
+                <label className="login-label">Mot de passe</label>
+                <div className="login-input-wrap">
+                  <Lock size={16} className="login-input-icon" />
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="login-input"
+                    autoComplete="new-password"
+                  />
+                </div>
+              </div>
+
+              {error && <div className="login-error">{error}</div>}
+
+              <button type="submit" className="login-submit" disabled={loading}>
+                {loading ? <span className="login-loader" /> : <>Créer mon compte <ArrowRight size={15} /></>}
+              </button>
+            </form>
+
+            <div className="login-footer-text">
+              Vous avez déjà un compte ? <Link to="/login" className="login-link">Connectez-vous</Link>
+            </div>
+          </div>
+
+          <div className="login-bottom-note">
+            Projet PFE — ISRA 2025
+          </div>
         </div>
       </div>
     </div>
