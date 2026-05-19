@@ -5,9 +5,9 @@ require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 const User = require('../models/User');
 
 const ADMIN = {
-  name:     'Admin ISRA',
-  email:    'admin@energywatch.ma',
-  password: 'Admin@2025',
+  name:     'Finance',
+  email:    'finance@energywatch.com',
+  password: 'Finance@2026',
   role:     'admin',
 };
 

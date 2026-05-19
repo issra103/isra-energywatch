@@ -71,20 +71,20 @@ export default function RegisterPage() {
         />
         <div className="login-video-overlay" />
         <div className="login-left-content">
-          <Link to="/" className="login-logo">
-            <div className="login-logo-icon">
-              <Zap size={18} color="#0a0a0a" />
-            </div>
-            <span className="login-logo-text">EnergyWatch</span>
-          </Link>
-          <div className="login-left-bottom">
+            <Link to="/" className="login-logo">
+              <div className="login-logo-icon">
+                <Zap size={18} className="text-indigo-600 fill-indigo-600" />
+              </div>
+              <span className="login-logo-text">EnergyWatch — Surveillance IoT</span>
+            </Link>
+            <div className="login-left-bottom">
             <h2 className="login-left-title">
-              Inscrivez-vous et pilotez
-              <br /> votre consommation énergétique
+              Optimisez votre
+              <br />
+              empreinte carbone
             </h2>
             <p className="login-left-sub">
-              Créez un compte utilisateur et accédez à vos rapports, prévisions
-              et alertes en un seul endroit.
+              Rejoignez la révolution énergétique et pilotez votre consommation avec précision grâce à l'IA.
             </p>
           </div>
         </div>
@@ -95,7 +95,7 @@ export default function RegisterPage() {
           <div className="login-form-header">
             <h1 className="login-form-title">Inscription</h1>
             <p className="login-form-sub">
-              Ouvrez un compte pour accéder au tableau de bord EnergyWatch.
+              Créez un compte pour débuter votre optimisation
             </p>
           </div>
 

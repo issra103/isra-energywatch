@@ -28,14 +28,40 @@ function groupBySection(items) {
 export default function Layout() {
   const grouped = groupBySection(NAV_ITEMS);
   const navigate = useNavigate();
-  const stored = localStorage.getItem('user');
-  const user = stored ? JSON.parse(stored) : null;
+  const [user, setUser] = useState(() => {
+    const stored = localStorage.getItem('user');
+    return stored ? JSON.parse(stored) : null;
+  });
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
 
   useEffect(() => {
     document.body.classList.toggle('dark', theme === 'dark');
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  // Sync user data with MongoDB
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+        const res = await fetch(`${apiUrl}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+      } catch (err) {
+        console.error('Erreur sync user:', err);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
