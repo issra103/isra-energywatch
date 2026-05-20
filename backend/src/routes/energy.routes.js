@@ -3,7 +3,7 @@ const router  = express.Router();
 const path    = require('path');
 const { execFile } = require('child_process');
 const auth = require('../middleware/auth');
-const { getLatest, getKPIs, getMonthlyKPIs, getAnomalies, getMonthlyReport, getZonesDetail, getPredictions } = require('../controllers/energy.controller');
+const { getLatest, getKPIs, getMonthlyKPIs, getAnomalies, getMonthlyReport, getZonesDetail, getPredictions, getActiveTariff, updateTariff } = require('../controllers/energy.controller');
 
 const VENV_PYTHON = path.join(__dirname, '../../../ai_service/venv/bin/python');
 const ANOMALIES_SCRIPT = path.join(__dirname, '../../../ai_service/anomalies.py');
@@ -27,5 +27,7 @@ router.get('/anomalies',   getAnomalies);
 router.get('/reports',     getMonthlyReport);
 router.get('/zones',       getZonesDetail);
 router.get('/predictions', getPredictions);
+router.get('/tariffs',     getActiveTariff);
+router.put('/tariffs',     updateTariff);
 
 module.exports = router;

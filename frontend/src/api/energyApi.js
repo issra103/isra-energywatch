@@ -34,4 +34,6 @@ export const getPredictions     = ()             => api.get('/api/energy/predict
 export const getSimulatorStatus = ()             => api.get('/api/simulate/status').then(r => r.data);
 export const startSimulator     = ()             => api.post('/api/simulate/start').then(r => r.data);
 export const stopSimulator      = ()             => api.post('/api/simulate/stop').then(r => r.data);
+export const getActiveTariff     = ()             => api.get('/api/energy/tariffs').then(r => r.data);
+export const updateTariff        = (data)         => api.put('/api/energy/tariffs', data).then(r => r.data);
 

@@ -1,4 +1,5 @@
 const SensorData = require('../models/SensorData');
+const Tariff     = require('../models/Tariff');
 
 function getPeriodMatch(period) {
   if (!period || period === 'all') return {};
@@ -211,9 +212,50 @@ exports.getZonesDetail = async (req, res) => {
 
 exports.getPredictions = async (req, res) => {
   try {
-    const data = await SensorData.find({ energy_kwh: { $ne: null } })
-      .sort({ datetime: -1 }).limit(100).lean();
+    const data = await SensorData.find({ 
+      $or: [
+        { predicted_next_hour: { $ne: null } },
+        { predicted_next_w: { $ne: null } }
+      ]
+    })
+      .sort({ datetime: -1 })
+      .limit(100)
+      .lean();
     res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getActiveTariff = async (req, res) => {
+  try {
+    const tariff = await Tariff.findOne({ is_active: true }).lean();
+    res.json(tariff);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.updateTariff = async (req, res) => {
+  try {
+    const { heure_pleine, heure_creuse } = req.body;
+    
+    let tariff = await Tariff.findOne({ is_active: true });
+    
+    if (!tariff) {
+      tariff = new Tariff({
+        name: 'STEG Basse Tension 2026',
+        heure_pleine,
+        heure_creuse,
+        is_active: true
+      });
+    } else {
+      tariff.heure_pleine = heure_pleine;
+      tariff.heure_creuse = heure_creuse;
+    }
+    
+    await tariff.save();
+    res.json({ success: true, tariff });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

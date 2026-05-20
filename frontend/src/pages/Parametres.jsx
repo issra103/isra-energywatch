@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getSimulatorStatus, startSimulator, stopSimulator } from '../api/energyApi';
+import { getSimulatorStatus, startSimulator, stopSimulator, getActiveTariff, updateTariff as updateTariffApi } from '../api/energyApi';
 import axios from 'axios';
 import {
   RefreshCw, Play, Square, Cpu, Server, Info, CreditCard,
@@ -19,10 +19,10 @@ function StatusBadge({ ok, label }) {
 }
 
 const DEFAULT_TARIFFS = [
-  { label: 'Heure creuse (00h–08h)',    rate: 0.150, color: '#10b981' },
-  { label: 'Heure normale (08h–17h)',   rate: 0.250, color: '#6366f1' },
-  { label: 'Heure de pointe (17h–22h)', rate: 0.350, color: '#f59e0b' },
-  { label: 'Heure normale (22h–00h)',   rate: 0.250, color: '#4f46e5' },
+  { label: 'Heure creuse (00h–08h)',    rate: 0.150, color: '#10b981', key: 'heure_creuse' },
+  { label: 'Heure normale (08h–17h)',   rate: 0.250, color: '#6366f1', key: 'heure_pleine' },
+  { label: 'Heure de pointe (17h–22h)', rate: 0.350, color: '#f59e0b', key: 'heure_pleine' },
+  { label: 'Heure normale (22h–00h)',   rate: 0.250, color: '#4f46e5', key: 'heure_pleine' },
 ];
 
 function TariffRow({ item, onSave }) {
@@ -91,11 +91,21 @@ export default function Parametres() {
 
   const checkServices = useCallback(async () => {
     setChecksLoading(true);
-    await Promise.allSettled([
+    const results = await Promise.allSettled([
       getSimulatorStatus().then(s => setSimStatus(s.status)).catch(() => setSimStatus('unknown')),
       axios.get('http://localhost:4000/api/energy/kpis', { timeout: 3000, headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }).then(() => setBackendOk(true)).catch(() => setBackendOk(false)),
       axios.get('http://localhost:8000/health', { timeout: 3000 }).then(() => setAiOk(true)).catch(() => setAiOk(false)),
+      getActiveTariff(),
     ]);
+
+    const tRes = results[3];
+    if (tRes.status === 'fulfilled' && tRes.value) {
+      setTariffs(prev => prev.map(t => {
+        if (t.key === 'heure_creuse') return { ...t, rate: tRes.value.heure_creuse };
+        if (t.key === 'heure_pleine') return { ...t, rate: tRes.value.heure_pleine };
+        return t;
+      }));
+    }
     setChecksLoading(false);
   }, []);
 
@@ -114,9 +124,16 @@ export default function Parametres() {
     setTariffs(prev => prev.map((t, i) => i === index ? { ...t, rate: newRate } : t));
   };
 
-  const handleSaveAll = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  const handleSaveAll = async () => {
+    try {
+      const creuse = tariffs.find(t => t.key === 'heure_creuse')?.rate || 0.15;
+      const pleine = tariffs.find(t => t.label.includes('08h–17h'))?.rate || 0.25;
+      await updateTariffApi({ heure_pleine: pleine, heure_creuse: creuse });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      console.error('Error saving tariffs:', err);
+    }
   };
 
   const isRunning = simStatus === 'running';
