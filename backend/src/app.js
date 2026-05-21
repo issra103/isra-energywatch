@@ -1,9 +1,13 @@
+// Fix SSL pour Windows (doit être en tout premier)
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const express  = require('express');
 const http     = require('http');
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const cors     = require('cors');
 const path     = require('path');
+const session  = require('express-session');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const iotRoutes      = require('./routes/iot.routes');
@@ -18,7 +22,7 @@ const io     = new Server(server, {
 });
 
 // ─── Middleware ────────────────────────────────────────────────────────────────
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000' }));
+app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000', credentials: true }));
 app.use(express.json());
 app.set('io', io);
 

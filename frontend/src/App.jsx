@@ -3,6 +3,8 @@ import './index.css';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import GoogleAuthSuccess from './pages/GoogleAuthSuccess';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard       from './pages/Dashboard';
@@ -20,7 +22,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/auth/google/success" element={<GoogleAuthSuccess />} />
         <Route path="/dashboard" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index                    element={<Dashboard />} />
           <Route path="flux"              element={<FluxEnDirect />} />
