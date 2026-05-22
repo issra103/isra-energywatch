@@ -228,7 +228,7 @@ export default function Parametres() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {[
-              { label: 'Projet',           value: 'EnergyWatch — PFE ESPRIT' },
+              { label: 'Projet',           value: 'Energy SaaS — PFE ESPRIT' },
               { label: 'Version',          value: 'v1.0.0' },
               { label: 'Base de données',  value: 'MongoDB localhost:27017' },
               { label: 'Collection',       value: 'energywatch.sensordatas' },

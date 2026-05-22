@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════════════════
-#  EnergyWatch — Lanceur universel
+#  Energy SaaS — Lanceur universel
 #  Usage : ./start.sh
 #  Démarre : MongoDB · Backend Node.js · Service IA FastAPI · Simulateur · Frontend
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -140,7 +140,7 @@ fi
 # ─── Récapitulatif ────────────────────────────────────────────────────────────
 echo ""
 echo -e "${GREEN}╔══════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║     EnergyWatch — Tous les services actifs       ║${NC}"
+echo -e "${GREEN}║     Energy SaaS — Tous les services actifs       ║${NC}"
 echo -e "${GREEN}╠══════════════════════════════════════════════════╣${NC}"
 echo -e "${GREEN}║${NC}  🗄  MongoDB        localhost:27017              ${GREEN}║${NC}"
 echo -e "${GREEN}║${NC}  ⚙️  Backend API    http://localhost:4000        ${GREEN}║${NC}"

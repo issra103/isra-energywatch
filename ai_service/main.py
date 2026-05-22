@@ -5,7 +5,7 @@ import numpy as np
 import os
 from pathlib import Path
 
-app = FastAPI(title="EnergyWatch AI Service", version="1.0.0")
+app = FastAPI(title="Energy SaaS AI Service", version="1.0.0")
 
 # Always resolve relative to this file's location — safe regardless of CWD
 MODELS_DIR = Path(__file__).parent / "models"

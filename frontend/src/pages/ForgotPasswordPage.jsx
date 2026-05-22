@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
         <div className="login-left-content">
           <Link to="/" className="login-logo">
             <div className="login-logo-icon"><Zap size={18} color="#0a0a0a" /></div>
-            <span className="login-logo-text">EnergyWatch</span>
+            <span className="login-logo-text">Energy SaaS</span>
           </Link>
           <div className="login-left-bottom">
             <h2 className="login-left-title">Récupérez<br />votre accès</h2>

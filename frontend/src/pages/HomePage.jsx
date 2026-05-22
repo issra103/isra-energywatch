@@ -20,7 +20,7 @@ const FEATURES = [
 ];
 
 const STEPS = [
-  { num: '01', Icon: Wifi,     title: 'Connectez',  desc: 'Branchez vos capteurs IoT au réseau EnergyWatch en quelques minutes.' },
+  { num: '01', Icon: Wifi,     title: 'Connectez',  desc: 'Branchez vos capteurs IoT au réseau Energy SaaS en quelques minutes.' },
   { num: '02', Icon: Database,  title: 'Collectez',  desc: 'Les données affluent en temps réel vers votre tableau de bord intelligent.' },
   { num: '03', Icon: TrendingUp, title: 'Analysez', desc: 'L\'IA détecte les anomalies et prédit la consommation future.' },
   { num: '04', Icon: Lock,      title: 'Optimisez',  desc: 'Appliquez les recommandations et réduisez vos coûts énergétiques.' },
@@ -214,7 +214,7 @@ export default function HomePage() {
             <div className="hp-nav-icon">
               <Zap size={16} color="#0a0a0a" />
             </div>
-            <span className="hp-nav-title">EnergyWatch</span>
+            <span className="hp-nav-title">Energy SaaS</span>
           </div>
           <div className="hp-nav-links">
             <a href="#features">Fonctionnalités</a>
@@ -239,7 +239,7 @@ export default function HomePage() {
               <span className="hp-text-dim">énergie en temps réel</span>
             </h1>
             <p className="hp-hero-sub">
-              EnergyWatch combine l'Internet des Objets et l'Intelligence Artificielle
+              Energy SaaS combine l'Internet des Objets et l'Intelligence Artificielle
               pour révolutionner la gestion énergétique.
             </p>
             <div className="hp-hero-actions">
@@ -362,7 +362,7 @@ export default function HomePage() {
             <div className="hp-footer-inner">
               <div className="hp-footer-brand">
                 <Zap size={14} style={{ color: 'rgba(255,255,255,0.5)' }} />
-                <span>EnergyWatch</span>
+                <span>Energy SaaS</span>
               </div>
               <div className="hp-footer-copy">Projet PFE — ISRA 2025</div>
             </div>

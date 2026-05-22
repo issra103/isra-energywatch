@@ -56,12 +56,12 @@ exports.forgotPassword = async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     // Envoyer l'email
-    const message = `Votre code de récupération EnergyWatch est : ${resetCode}\nCe code est valide pendant 10 minutes.`;
+    const message = `Votre code de récupération Energy SaaS est : ${resetCode}\nCe code est valide pendant 10 minutes.`;
     
     try {
       await sendEmail({
         email: user.email,
-        subject: 'Récupération de mot de passe - EnergyWatch',
+        subject: 'Récupération de mot de passe - Energy SaaS',
         message,
       });
 

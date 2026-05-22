@@ -84,7 +84,7 @@ export default function Layout() {
             <Zap size={18} color="white" />
           </div>
           <div>
-            <div className="sidebar-logo-text">EnergyWatch</div>
+            <div className="sidebar-logo-text">Energy SaaS</div>
             <div className="sidebar-logo-sub">IoT Monitor</div>
           </div>
         </div>
@@ -129,7 +129,7 @@ export default function Layout() {
             {theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
           </button>
           <div style={{ fontSize: '0.7rem', color: 'var(--text-subtle)', letterSpacing: '0.05em', marginTop: '0.75rem' }}>
-            <div style={{ fontWeight: 600, marginBottom: 2 }}>EnergyWatch v1.0</div>
+            <div style={{ fontWeight: 600, marginBottom: 2 }}>Energy SaaS v1.0</div>
             <div>Projet PFE — ISRA 2025</div>
           </div>
         </div>

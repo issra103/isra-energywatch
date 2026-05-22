@@ -75,7 +75,7 @@ export default function RegisterPage() {
             <div className="login-logo-icon">
               <Zap size={18} className="text-indigo-600 fill-indigo-600" />
             </div>
-            <span className="login-logo-text">EnergyWatch</span>
+            <span className="login-logo-text">Energy SaaS</span>
           </Link>
           <div className="login-left-bottom">
             <h2 className="login-left-title">
