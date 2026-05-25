@@ -89,7 +89,7 @@ function LayoutInner() {
           </div>
         </div>
 
-        <nav style={{ flex: 1, overflow: 'auto' }}>
+        <nav className="sidebar-nav">
           {Object.entries(grouped).map(([section, items]) => (
             <div key={section}>
               <div className="nav-section-label">{t(`sections.${section}`)}</div>

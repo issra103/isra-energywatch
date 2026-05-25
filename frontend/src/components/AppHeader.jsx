@@ -53,8 +53,8 @@ export default function AppHeader({ user, theme, onToggleTheme }) {
             aria-haspopup="listbox"
             title={t('header.language')}
           >
-            <span className="app-header-flag">{currentLang.flag}</span>
-            <Languages size={14} />
+            <span className="app-header-lang-code">{lang.toUpperCase()}</span>
+            <Languages size={15} />
             <ChevronDown size={12} className={langOpen ? 'is-open' : ''} />
           </button>
           {langOpen && (

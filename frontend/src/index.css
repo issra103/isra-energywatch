@@ -229,12 +229,15 @@ body {
 
 .app-header-lang-btn {
   width: auto;
-  padding: 0 0.65rem;
+  padding: 0 0.75rem;
+  gap: 0.4rem;
 }
 
-.app-header-flag {
-  font-size: 1rem;
-  line-height: 1;
+.app-header-lang-code {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ui-navy-dark);
+  letter-spacing: 0.04em;
 }
 
 .app-header-icon-btn:hover {
@@ -421,12 +424,19 @@ body {
   box-shadow: 2px 0 12px rgba(61, 90, 128, 0.08);
 }
 
+.sidebar-nav {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
 .sidebar-logo {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0 0.5rem;
   margin-bottom: 2rem;
+  flex-shrink: 0;
 }
 
 .sidebar-logo-icon {
@@ -491,10 +501,14 @@ body {
 }
 
 .nav-link.active {
-  color: var(--ui-navy-dark);
+  color: var(--ui-orange);
   background: rgba(240, 160, 48, 0.12);
   border: 1px solid rgba(240, 160, 48, 0.25);
   box-shadow: none;
+}
+
+.nav-link.active svg {
+  stroke: var(--ui-orange);
 }
 
 .nav-link.active::before {
@@ -2404,9 +2418,13 @@ body.dark .nav-link:hover {
 }
 
 body.dark .nav-link.active {
-  color: #f8fafc;
+  color: #f0a030;
   background: rgba(240, 160, 48, 0.14);
   border-color: rgba(240, 160, 48, 0.28);
+}
+
+body.dark .nav-link.active svg {
+  stroke: #f0a030;
 }
 
 body.dark .sidebar-logout-btn {
@@ -2752,8 +2770,12 @@ body.dark .app-header-dropdown {
   border-color: var(--ui-border);
 }
 
+body.dark .app-header-lang-code {
+  color: #e2e8f0;
+}
+
 body.dark .app-header-profile-name {
-  color: var(--ui-navy-dark);
+  color: #f1f5f9;
 }
 
 body.dark .app-header-profile-role {
