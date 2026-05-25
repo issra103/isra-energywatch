@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
+import { LanguageProvider } from './context/LanguageContext';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -18,6 +19,7 @@ import Parametres      from './pages/Parametres';
 
 export default function App() {
   return (
+    <LanguageProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -36,6 +38,7 @@ export default function App() {
         </Route>
       </Routes>
     </BrowserRouter>
+    </LanguageProvider>
   );
 }
 

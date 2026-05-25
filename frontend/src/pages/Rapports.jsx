@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { getMonthlyReport, getLatest } from '../api/energyApi';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { ChevronLeft, ChevronRight, BarChart2 } from 'lucide-react';
-
-const EQUIP_COLORS = { Climatisation: '#10b981', Serveur: '#6366f1', 'Éclairage': '#f59e0b' };
+import { NAVY, ORANGE, MUTED, EQUIP_COLORS, CHART_TIP } from '../theme/colors';
+import { useLanguage } from '../context/LanguageContext';
 
 function fmt(n, d = 2) { return n != null ? Number(n).toFixed(d) : '—'; }
 
@@ -14,6 +14,7 @@ function addMonths(str, delta) {
 }
 
 export default function Rapports() {
+  const { t, te } = useLanguage();
   const [month, setMonth] = useState(() => new Date().toISOString().slice(0, 7));
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -40,7 +41,6 @@ export default function Rapports() {
       .finally(() => setLoading(false));
   }, [month]);
 
-  // Transform daily data for chart: each day, sum across equipment types
   const dailyTotals = (() => {
     if (!data?.daily) return [];
     const byDay = {};
@@ -55,7 +55,6 @@ export default function Rapports() {
     return Object.values(byDay).sort((a, b) => a.day.localeCompare(b.day));
   })();
 
-  // Monthly totals per equipment type
   const equipTotals = (() => {
     if (!data?.daily) return {};
     const totals = {};
@@ -73,10 +72,16 @@ export default function Rapports() {
 
   const exportCSV = () => {
     if (!data?.daily || dailyTotals.length === 0) return;
-    const headers = ['Jour', 'Équipement', 'Énergie (kWh)', 'Coût (DT)', 'Anomalies'];
+    const headers = [
+      t('rapports.csvDay'),
+      t('rapports.csvEquip'),
+      t('rapports.csvEnergy'),
+      t('rapports.csvCost'),
+      t('rapports.csvAnomalies'),
+    ];
     const rows = data.daily.map(d => [
       String(d._id.day).padStart(2, '0'),
-      d._id.type_equipement || '-',
+      te(d._id.type_equipement) || d._id.type_equipement || '-',
       (d.total_kwh || 0).toFixed(3),
       (d.total_cost_dt || 0).toFixed(4),
       d.anomaly_count || 0,
@@ -93,15 +98,15 @@ export default function Rapports() {
 
   return (
     <div className="page-wrapper">
-      <div className="page-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+      <header className="dui-header">
         <div>
-          <h1 className="page-title gradient-text" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <BarChart2 size={22} /> Rapports mensuel
+          <h1 className="dui-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <BarChart2 size={22} color={NAVY} /> {t('rapports.title')}
           </h1>
-          <p className="page-subtitle">Analyse de la consommation énergétique par mois et par zone</p>
+          <p className="dui-sub">{t('rapports.subtitle')}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <button className="btn btn-ghost" style={{ padding: '0.4rem 0.6rem' }} onClick={() => setMonth(m => addMonths(m, -1))}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button type="button" className="dui-period" onClick={() => setMonth(m => addMonths(m, -1))} style={{ padding: '0.4rem 0.6rem' }}>
             <ChevronLeft size={16} />
           </button>
           <input
@@ -111,55 +116,52 @@ export default function Rapports() {
             className="glass-input"
             style={{ width: 'auto', padding: '0.4rem 0.75rem', colorScheme: 'light' }}
           />
-          <button className="btn btn-ghost" style={{ padding: '0.4rem 0.6rem' }} onClick={() => setMonth(m => addMonths(m, 1))}>
+          <button type="button" className="dui-period" onClick={() => setMonth(m => addMonths(m, 1))} style={{ padding: '0.4rem 0.6rem' }}>
             <ChevronRight size={16} />
           </button>
-          <button className="btn btn-emerald" style={{ padding: '0.4rem 0.9rem', fontSize: '0.75rem', marginLeft: '0.5rem' }} onClick={exportCSV} disabled={!data?.daily}>
-            📥 Export CSV
+          <button type="button" className="dui-btn-orange" style={{ fontSize: '0.75rem' }} onClick={exportCSV} disabled={!data?.daily}>
+            {t('common.exportCsv')}
           </button>
         </div>
-      </div>
-      <div className="holo-line" style={{ marginBottom: '1.5rem' }} />
+      </header>
 
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
           <div className="loader-spin" style={{ width: 40, height: 40 }} />
         </div>
       ) : !data || dailyTotals.length === 0 ? (
-        <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-          Aucune donnée pour {month}. Lancez le simulateur pour collecter des données.
+        <div className="dui-empty">
+          {t('rapports.noData', { month })}
         </div>
       ) : (
         <>
-          {/* Summary cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-            <div className="glass-panel" style={{ padding: '1.25rem' }}>
-              <span className="kpi-label">Énergie totale</span>
-              <div className="kpi-value" style={{ color: '#10b981' }}>{fmt(grandTotal.kwh, 2)}<span className="kpi-unit"> kWh</span></div>
+          <div className="dui-kpis dui-kpis--motion" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', marginBottom: '1.25rem' }}>
+            <div className="dui-kpi dui-kpi--featured dui-kpi--motion">
+              <span className="dui-kpi-label">{t('rapports.totalEnergy')}</span>
+              <div className="dui-kpi-value">{fmt(grandTotal.kwh, 2)}<span className="dui-kpi-unit"> kWh</span></div>
             </div>
-            <div className="glass-panel" style={{ padding: '1.25rem' }}>
-              <span className="kpi-label">Coût total</span>
-              <div className="kpi-value" style={{ color: '#f59e0b' }}>{fmt(grandTotal.cost, 3)}<span className="kpi-unit"> DT</span></div>
+            <div className="dui-kpi dui-kpi--motion">
+              <span className="dui-kpi-label">{t('rapports.totalCost')}</span>
+              <div className="dui-kpi-value" style={{ color: ORANGE }}>{fmt(grandTotal.cost, 3)}<span className="dui-kpi-unit"> DT</span></div>
             </div>
-            <div className="glass-panel" style={{ padding: '1.25rem' }}>
-              <span className="kpi-label">Anomalies</span>
-              <div className="kpi-value" style={{ color: '#ef4444' }}>{grandTotal.anomalies}</div>
+            <div className="dui-kpi dui-kpi--motion">
+              <span className="dui-kpi-label">{t('common.anomalies')}</span>
+              <div className="dui-kpi-value" style={{ color: ORANGE }}>{grandTotal.anomalies}</div>
             </div>
-            <div className="glass-panel" style={{ padding: '1.25rem' }}>
-              <span className="kpi-label">Jours avec données</span>
-              <div className="kpi-value" style={{ color: '#4f46e5' }}>{dailyTotals.length}</div>
+            <div className="dui-kpi dui-kpi--motion">
+              <span className="dui-kpi-label">{t('rapports.daysWithData')}</span>
+              <div className="dui-kpi-value">{dailyTotals.length}</div>
             </div>
           </div>
 
-          {/* Per-equipment summary */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-            {Object.entries(equipTotals).map(([equip, t]) => {
-              const c = EQUIP_COLORS[equip] || '#6366f1';
-              const pct = grandTotal.kwh > 0 ? (t.kwh / grandTotal.kwh * 100) : 0;
+          <div className="dui-kpis dui-kpis--motion" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: '1.5rem' }}>
+            {Object.entries(equipTotals).map(([equip, totals]) => {
+              const c = EQUIP_COLORS[equip] || NAVY;
+              const pct = grandTotal.kwh > 0 ? (totals.kwh / grandTotal.kwh * 100) : 0;
               return (
-                <div key={equip} className="glass-panel" style={{ padding: '1.25rem', borderColor: c + '30' }}>
+                <div key={equip} className="dui-equip-card dui-kpi--motion">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                    <span style={{ fontWeight: 700 }}>{equip}</span>
+                    <span style={{ fontWeight: 700 }}>{te(equip)}</span>
                     <span className="badge" style={{ background: c + '20', color: c, border: '1px solid ' + c + '40' }}>{fmt(pct, 1)}%</span>
                   </div>
                   <div style={{ height: 4, background: 'rgba(15,23,42,0.08)', borderRadius: 2, marginBottom: '0.75rem' }}>
@@ -167,12 +169,12 @@ export default function Rapports() {
                   </div>
                   <div style={{ fontSize: '0.8rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
                     <div>
-                      <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>Énergie</div>
-                      <div style={{ fontWeight: 700, color: c }}>{fmt(t.kwh, 2)} kWh</div>
+                      <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>{t('common.energy')}</div>
+                      <div style={{ fontWeight: 700, color: c }}>{fmt(totals.kwh, 2)} kWh</div>
                     </div>
                     <div>
-                      <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>Coût</div>
-                      <div style={{ fontWeight: 700, color: '#b45309' }}>{fmt(t.cost, 3)} DT</div>
+                      <div style={{ color: MUTED, fontSize: '0.7rem' }}>{t('common.cost')}</div>
+                      <div style={{ fontWeight: 700, color: ORANGE }}>{fmt(totals.cost, 3)} DT</div>
                     </div>
                   </div>
                 </div>
@@ -180,39 +182,33 @@ export default function Rapports() {
             })}
           </div>
 
-          {/* Daily energy chart */}
-          <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
-            <div style={{ fontWeight: 700, marginBottom: '1rem' }}>Consommation journalière (kWh)</div>
+          <div className="dui-panel" style={{ marginBottom: '1.25rem' }}>
+            <div style={{ fontWeight: 700, marginBottom: '1rem' }}>{t('rapports.dailyKwh')}</div>
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={dailyTotals} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(15,23,42,0.07)" />
                 <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'rgba(100,116,139,0.8)' }} />
                 <YAxis tick={{ fontSize: 10, fill: 'rgba(100,116,139,0.8)' }} unit=" kWh" />
-                <Tooltip
-                  contentStyle={{ background: 'rgba(255,255,255,0.98)', border: '1px solid rgba(15,23,42,0.1)', borderRadius: 8, fontSize: 12, color: 'rgba(15,23,42,0.9)' }}
-                />
+                <Tooltip contentStyle={CHART_TIP} />
                 <Legend wrapperStyle={{ fontSize: '0.75rem' }} />
                 {Object.entries(EQUIP_COLORS).map(([e, c]) => (
-                  <Bar key={e} dataKey={e + '_kwh'} name={e} fill={c} radius={[3, 3, 0, 0]} />
+                  <Bar key={e} dataKey={e + '_kwh'} name={te(e)} fill={c} radius={[3, 3, 0, 0]} />
                 ))}
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Daily cost chart */}
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <div style={{ fontWeight: 700, marginBottom: '1rem' }}>Coût journalier (DT)</div>
+          <div className="dui-panel">
+            <div style={{ fontWeight: 700, marginBottom: '1rem' }}>{t('rapports.dailyCost')}</div>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={dailyTotals} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(15,23,42,0.07)" />
                 <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'rgba(100,116,139,0.8)' }} />
                 <YAxis tick={{ fontSize: 10, fill: 'rgba(100,116,139,0.8)' }} />
-                <Tooltip
-                  contentStyle={{ background: 'rgba(255,255,255,0.98)', border: '1px solid rgba(15,23,42,0.1)', borderRadius: 8, fontSize: 12, color: 'rgba(15,23,42,0.9)' }}
-                />
+                <Tooltip contentStyle={CHART_TIP} />
                 <Legend wrapperStyle={{ fontSize: '0.75rem' }} />
                 {Object.entries(EQUIP_COLORS).map(([e, c]) => (
-                  <Bar key={e} dataKey={e + '_cost'} name={e + ' coût'} fill={c} opacity={0.75} radius={[3, 3, 0, 0]} />
+                  <Bar key={e} dataKey={e + '_cost'} name={te(e) + t('rapports.costSuffix')} fill={c} opacity={0.75} radius={[3, 3, 0, 0]} />
                 ))}
               </BarChart>
             </ResponsiveContainer>
