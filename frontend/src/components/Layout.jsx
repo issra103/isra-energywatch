@@ -83,10 +83,7 @@ function LayoutInner() {
           <div className="sidebar-logo-icon">
             <Zap size={18} color="white" />
           </div>
-          <div>
-            <div className="sidebar-logo-text">Energy SaaS</div>
-            <div className="sidebar-logo-sub">IoT Monitor</div>
-          </div>
+          <div className="sidebar-logo-text">Energy SaaS</div>
         </div>
 
         <nav className="sidebar-nav">

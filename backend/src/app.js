@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const cors     = require('cors');
 const path     = require('path');
 const session  = require('express-session');
+const { passport, initPassport } = require('./config/passport');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const iotRoutes      = require('./routes/iot.routes');
@@ -24,6 +25,18 @@ const io     = new Server(server, {
 // ─── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000', credentials: true }));
 app.use(express.json());
+
+// Session & Passport
+app.use(session({
+  secret: process.env.JWT_SECRET || 'secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // false pour dev localhost
+}));
+initPassport();
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.set('io', io);
 
 // ─── Routes ───────────────────────────────────────────────────────────────────

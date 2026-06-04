@@ -6,11 +6,16 @@ import { NAVY, NAVY_DARK, ORANGE, MUTED, EQUIP_COLORS } from '../theme/colors';
 import { useLanguage } from '../context/LanguageContext';
 
 const STATIC_TIP_DEFS = [
-  { Icon: Moon, titleKey: 'recommandations.tip1Title', descKey: 'recommandations.tip1Desc', tagKey: 'recommandations.tip1Tag', color: NAVY, savingKey: 'recommandations.tip1Saving' },
-  { Icon: Zap, titleKey: 'recommandations.tip2Title', descKey: 'recommandations.tip2Desc', tagKey: 'recommandations.tip2Tag', color: ORANGE, savingKey: 'recommandations.tip2Saving' },
-  { Icon: RotateCcw, titleKey: 'recommandations.tip3Title', descKey: 'recommandations.tip3Desc', tagKey: 'recommandations.tip3Tag', color: NAVY_DARK, savingKey: 'recommandations.tip3Saving' },
-  { Icon: Gauge, titleKey: 'recommandations.tip4Title', descKey: 'recommandations.tip4Desc', tagKey: 'recommandations.tip4Tag', color: '#5a7fa8', savingKey: 'recommandations.tip4Saving' },
+  { Icon: Moon, titleKey: 'recommandations.tip1Title', descKey: 'recommandations.tip1Desc', tagKey: 'recommandations.tip1Tag', color: NAVY, savingKey: 'recommandations.tip1Saving', group: 'blue' },
+  { Icon: Zap, titleKey: 'recommandations.tip2Title', descKey: 'recommandations.tip2Desc', tagKey: 'recommandations.tip2Tag', color: ORANGE, savingKey: 'recommandations.tip2Saving', group: 'orange' },
+  { Icon: RotateCcw, titleKey: 'recommandations.tip3Title', descKey: 'recommandations.tip3Desc', tagKey: 'recommandations.tip3Tag', color: NAVY_DARK, savingKey: 'recommandations.tip3Saving', group: 'blue' },
 ];
+
+function tipGroup(color) {
+  const c = (color || '').toLowerCase();
+  if (c === ORANGE.toLowerCase() || c === '#e89410' || c === '#f59e0b') return 'orange';
+  return 'blue';
+}
 
 function generateDynamicTips(kpis, t, te) {
   if (!kpis) return [];
@@ -97,7 +102,44 @@ export default function Recommandations() {
     [kpis, lang, t, te],
   );
 
-  const allTips = [...dynamicTips, ...staticTips];
+  const { blueTips, orangeTips } = useMemo(() => {
+    const merged = [...dynamicTips, ...staticTips].map((tip) => ({
+      ...tip,
+      group: tip.group ?? tipGroup(tip.color),
+    }));
+    return {
+      blueTips: merged.filter((t) => t.group === 'blue'),
+      orangeTips: merged.filter((t) => t.group === 'orange'),
+    };
+  }, [dynamicTips, staticTips]);
+
+  const renderTip = (tip, i) => (
+    <div
+      key={`${lang}-${tip.group}-${i}-${tip.title}`}
+      className={`dui-panel dui-reco-card dui-reco-card--${tip.group}`}
+    >
+      {tip.dynamic && (
+        <div className="dui-reco-personalized" style={{ background: tip.color + '20', color: tip.color }}>
+          {t('common.personalized')}
+        </div>
+      )}
+      <div className="dui-reco-card-inner">
+        <div className="dui-reco-icon" style={{ color: tip.color }}>
+          {tip.Icon && <tip.Icon size={24} />}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="dui-reco-card-head">
+            <span className="dui-reco-card-title">{tip.title}</span>
+            <span className="badge" style={{ background: tip.color + '20', color: tip.color, border: '1px solid ' + tip.color + '40', fontSize: '0.65rem' }}>
+              {tip.tag}
+            </span>
+          </div>
+          <p className="dui-reco-card-desc">{tip.desc}</p>
+          <div className="dui-reco-card-saving" style={{ color: tip.color }}>{tip.saving}</div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="page-wrapper" key={lang}>
@@ -137,35 +179,17 @@ export default function Recommandations() {
           <div className="loader-spin" style={{ width: 36, height: 36 }} />
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
-          {allTips.map((tip, i) => (
-            <div
-              key={`${lang}-${i}-${tip.title}`}
-              className="dui-panel"
-              style={{ position: 'relative', overflow: 'hidden' }}
-            >
-              {tip.dynamic && (
-                <div style={{ position: 'absolute', top: 0, right: 0, background: tip.color + '20', color: tip.color, fontSize: '0.65rem', padding: '2px 8px', borderBottomLeftRadius: 8, fontWeight: 700 }}>
-                  {t('common.personalized')}
-                </div>
-              )}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                <div style={{ lineHeight: 1, marginTop: 4, color: tip.color, flexShrink: 0 }}>
-                  {tip.Icon && <tip.Icon size={24} />}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{tip.title}</span>
-                    <span className="badge" style={{ background: tip.color + '20', color: tip.color, border: '1px solid ' + tip.color + '40', fontSize: '0.65rem' }}>
-                      {tip.tag}
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '0.8rem', color: MUTED, lineHeight: 1.6, margin: '0 0 0.75rem' }}>{tip.desc}</p>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: tip.color }}>{tip.saving}</div>
-                </div>
-              </div>
+        <div className="dui-reco-groups">
+          {blueTips.length > 0 && (
+            <div className="dui-reco-grid">
+              {blueTips.map(renderTip)}
             </div>
-          ))}
+          )}
+          {orangeTips.length > 0 && (
+            <div className="dui-reco-grid dui-reco-grid--orange">
+              {orangeTips.map(renderTip)}
+            </div>
+          )}
         </div>
       )}
     </div>

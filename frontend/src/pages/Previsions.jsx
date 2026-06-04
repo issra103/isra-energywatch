@@ -76,7 +76,6 @@ export default function Previsions() {
           <h1 className="dui-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <TrendingUp size={22} color={NAVY} /> {t('previsions.title')}
           </h1>
-          <p className="dui-sub">{t('previsions.subtitle')}</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
           {lastUpdate && (
@@ -96,11 +95,10 @@ export default function Previsions() {
           const mape = mapeByEquip[equip];
           return (
             <div key={equip} className="dui-kpi dui-kpi--motion">
-              <span className="dui-kpi-label">{t('previsions.mape', { equip: te(equip) })}</span>
+              <span className="dui-kpi-label">{te(equip)}</span>
               <div className="dui-kpi-value" style={{ color: c, fontSize: '1.75rem' }}>
                 {mape != null ? `${fmt(mape, 2)}%` : '—'}
               </div>
-              <div style={{ fontSize: '0.75rem', color: MUTED }}>{t('previsions.mae')}</div>
             </div>
           );
         })}
@@ -108,24 +106,6 @@ export default function Previsions() {
           <span className="dui-kpi-label">{t('previsions.readingsWithPred')}</span>
           <div className="dui-kpi-value">{predsWithPred}</div>
           <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>{t('common.onTotal', { total: predictions.length })}</div>
-        </div>
-      </div>
-
-      <div className="dui-panel" style={{ marginBottom: '1.25rem' }}>
-        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-          <div>
-            <div style={{ fontSize: '0.7rem', color: MUTED }}>{t('previsions.algorithm')}</div>
-            <div style={{ fontWeight: 700, color: NAVY_DARK }}>{t('previsions.rfRegressor')}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '0.7rem', color: MUTED }}>{t('previsions.features')}</div>
-            <div style={{ fontWeight: 600, fontSize: '0.875rem', color: NAVY_DARK }}>{t('previsions.featuresList')}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '0.7rem', color: MUTED }}>{t('previsions.training')}</div>
-            <div style={{ fontWeight: 600, fontSize: '0.875rem', color: NAVY_DARK }}>{t('previsions.trainingData')}</div>
-          </div>
-          <span className="dui-badge" style={{ alignSelf: 'center' }}>{t('previsions.modelActive')}</span>
         </div>
       </div>
 

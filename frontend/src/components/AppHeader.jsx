@@ -1,6 +1,25 @@
-import { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, Languages, User, ChevronDown } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
+import { Sun, Moon, Languages, User, ChevronDown, Zap } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+
+const PAGE_ROUTES = [
+  { path: '/dashboard/flux', key: 'flux' },
+  { path: '/dashboard/anomalies', key: 'anomalies' },
+  { path: '/dashboard/previsions', key: 'previsions' },
+  { path: '/dashboard/rapports', key: 'rapports' },
+  { path: '/dashboard/zones', key: 'zones' },
+  { path: '/dashboard/recommandations', key: 'recommandations' },
+  { path: '/dashboard/parametres', key: 'parametres' },
+  { path: '/dashboard', key: 'dashboard' },
+];
+
+function pageKeyFromPath(pathname) {
+  const match = PAGE_ROUTES.find((r) =>
+    r.path === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(r.path),
+  );
+  return match?.key ?? 'dashboard';
+}
 
 function roleLabel(role, t) {
   if (!role) return t('header.roleUser');
@@ -27,8 +46,10 @@ const LANG_OPTIONS = [
 
 export default function AppHeader({ user, theme, onToggleTheme }) {
   const { lang, setLang, t } = useLanguage();
+  const { pathname } = useLocation();
   const [langOpen, setLangOpen] = useState(false);
   const langRef = useRef(null);
+  const pageKey = useMemo(() => pageKeyFromPath(pathname), [pathname]);
 
   useEffect(() => {
     const close = (e) => {
@@ -38,12 +59,22 @@ export default function AppHeader({ user, theme, onToggleTheme }) {
     return () => document.removeEventListener('click', close);
   }, []);
 
-  const currentLang = LANG_OPTIONS.find((l) => l.id === lang) || LANG_OPTIONS[0];
   const isDark = theme === 'dark';
 
   return (
     <header className="app-header">
-      <div className="app-header-actions">
+      <div className="app-header-inner">
+        <div className="app-header-brand">
+          <span className="app-header-brand-icon" aria-hidden>
+            <Zap size={18} />
+          </span>
+          <div className="app-header-brand-text">
+            <span className="app-header-brand-name">Energy SaaS</span>
+            <span className="app-header-page">{t(`nav.${pageKey}`)}</span>
+          </div>
+        </div>
+
+        <div className="app-header-toolbar">
         <div className="app-header-lang" ref={langRef}>
           <button
             type="button"
@@ -117,6 +148,7 @@ export default function AppHeader({ user, theme, onToggleTheme }) {
             </div>
           </div>
         )}
+        </div>
       </div>
     </header>
   );

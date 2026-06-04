@@ -85,7 +85,7 @@ export default function ForgotPasswordPage() {
         <video src="/13509218_3840_2160_60fps.mp4" autoPlay muted loop playsInline className="login-video" />
         <div className="login-video-overlay" />
         <div className="login-left-content">
-          <Link to="/" className="login-logo">
+          <Link to="/login" className="login-logo">
             <div className="login-logo-icon"><Zap size={18} color="#0a0a0a" /></div>
             <span className="login-logo-text">Energy SaaS</span>
           </Link>
@@ -192,7 +192,6 @@ export default function ForgotPasswordPage() {
           </div>
         </div>
 
-        <div className="login-bottom-note">Projet PFE — ISRA 2025</div>
       </div>
     </div>
   );

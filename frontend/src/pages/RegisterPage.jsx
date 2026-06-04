@@ -71,7 +71,7 @@ export default function RegisterPage() {
         />
         <div className="login-video-overlay" />
         <div className="login-left-content">
-          <Link to="/" className="login-logo">
+          <Link to="/login" className="login-logo">
             <div className="login-logo-icon">
               <Zap size={18} className="text-indigo-600 fill-indigo-600" />
             </div>
@@ -162,9 +162,6 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        <div className="login-bottom-note">
-          Projet PFE — ISRA 2025
-        </div>
       </div>
     </div>
   );

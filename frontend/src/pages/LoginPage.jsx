@@ -70,7 +70,7 @@ export default function LoginPage() {
         />
         <div className="login-video-overlay" />
         <div className="login-left-content">
-          <Link to="/" className="login-logo">
+          <Link to="/login" className="login-logo">
             <div className="login-logo-icon">
               <Zap size={18} color="#0a0a0a" />
             </div>
@@ -187,9 +187,6 @@ export default function LoginPage() {
           </button>
         </div>
 
-        <div className="login-bottom-note">
-          Projet PFE — ISRA 2025
-        </div>
       </div>
     </div>
   );

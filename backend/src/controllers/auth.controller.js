@@ -144,3 +144,16 @@ exports.register = async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur.', error: err.message });
   }
 };
+
+exports.googleCallback = (req, res) => {
+  const token = signToken(req.user);
+  const user = encodeURIComponent(JSON.stringify({
+    id: req.user._id,
+    name: req.user.name,
+    email: req.user.email,
+    role: req.user.role
+  }));
+  
+  // Redirection vers le frontend avec le token et les infos user en query params
+  res.redirect(`${process.env.FRONTEND_URL}/auth/google/success?token=${token}&user=${user}`);
+};

@@ -12,7 +12,7 @@ const sendEmail = async (options) => {
 
   // 2) Définir les options de l'email
   const mailOptions = {
-    from: `Energy SaaS <${process.env.EMAIL_USER}>`,
+    from: `EnergyWatch <${process.env.EMAIL_USER}>`,
     to: options.email,
     subject: options.subject,
     text: options.message,

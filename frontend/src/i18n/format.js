@@ -21,3 +21,15 @@ export function fmtDate(ts, lang) {
     second: '2-digit',
   });
 }
+
+export function fmtTodayDate(lang, date = new Date()) {
+  const raw = date.toLocaleString(getLocale(lang), {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  return raw.charAt(0).toUpperCase() + raw.slice(1);
+}

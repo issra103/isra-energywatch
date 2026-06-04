@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { NAVY, NAVY_DARK, ORANGE, MUTED, ZONE_COLORS, CHART_TIP } from '../theme/colors';
 import { useLanguage } from '../context/LanguageContext';
-import { fmtTime as fmtTimeLocale } from '../i18n/format';
+import { fmtTime as fmtTimeLocale, fmtTodayDate } from '../i18n/format';
 
 const BAR_COLORS = [NAVY, ORANGE];
 
@@ -39,9 +39,15 @@ export default function Dashboard() {
   const [simLoading, setSimLoading] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [kpiPeriod, setKpiPeriod] = useState('all');
+  const [now, setNow] = useState(() => new Date());
   const liveRef = useRef([]);
 
   const fmtTime = (ts) => fmtTimeLocale(ts, lang);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const load = useCallback(async () => {
     try {
@@ -129,7 +135,7 @@ export default function Dashboard() {
       <header className="dui-header">
         <div>
           <h1 className="dui-title">{t('dashboard.title')}</h1>
-          <p className="dui-sub">{t('dashboard.subtitle')}</p>
+          <p className="dui-sub">{fmtTodayDate(lang, now)}</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
           <span className={`dui-status ${isRunning ? 'is-live' : ''}`}>
@@ -207,8 +213,8 @@ export default function Dashboard() {
         </section>
       )}
 
-      <section className="dui-grid">
-        <div className="dui-panel">
+      <section className="dui-chart-full">
+        <div className="dui-panel dui-panel--chart-wide">
           <div className="dui-panel-head">
             <span className="dui-panel-title">{t('dashboard.chartZones')}</span>
             <div className="dui-legend">
@@ -220,68 +226,72 @@ export default function Dashboard() {
               ))}
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={chartData} margin={{ top: 4, right: 4, left: -18, bottom: 0 }}>
+          <ResponsiveContainer width="100%" height={360}>
+            <AreaChart data={chartData} margin={{ top: 8, right: 12, left: -12, bottom: 0 }}>
               <defs>
                 <linearGradient id="gd_navy" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={NAVY} stopOpacity={0.2} />
+                  <stop offset="0%" stopColor={NAVY} stopOpacity={0.25} />
                   <stop offset="100%" stopColor={NAVY} stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="gd_orange" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={ORANGE} stopOpacity={0.2} />
+                  <stop offset="0%" stopColor={ORANGE} stopOpacity={0.25} />
                   <stop offset="100%" stopColor={ORANGE} stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="gd_navy_dark" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={NAVY_DARK} stopOpacity={0.2} />
+                  <stop offset="100%" stopColor={NAVY_DARK} stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#eef1f6" vertical={false} />
               <XAxis dataKey="t" tick={{ fontSize: 10, fill: MUTED }} interval="preserveStartEnd" axisLine={{ stroke: '#dde3eb' }} />
               <YAxis tick={{ fontSize: 10, fill: MUTED }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={tip} labelStyle={{ color: NAVY_DARK, fontWeight: 600, fontSize: 11 }} />
-              <Area type="monotone" dataKey="Zone1" stroke={NAVY} strokeWidth={2} fill="url(#gd_navy)" dot={false} isAnimationActive={false} />
-              <Area type="monotone" dataKey="Zone2" stroke={ORANGE} strokeWidth={2} fill="url(#gd_orange)" dot={false} isAnimationActive={false} />
-              <Area type="monotone" dataKey="Zone3" stroke={NAVY_DARK} strokeWidth={2} fill="url(#gd_navy)" dot={false} isAnimationActive={false} />
+              <Area type="monotone" dataKey="Zone1" stroke={NAVY} strokeWidth={2.5} fill="url(#gd_navy)" dot={false} isAnimationActive={false} />
+              <Area type="monotone" dataKey="Zone2" stroke={ORANGE} strokeWidth={2.5} fill="url(#gd_orange)" dot={false} isAnimationActive={false} />
+              <Area type="monotone" dataKey="Zone3" stroke={NAVY_DARK} strokeWidth={2.5} fill="url(#gd_navy_dark)" dot={false} isAnimationActive={false} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
+      </section>
 
-        <div className="dui-side-stack">
-          <div className="dui-panel">
-            <div className="dui-panel-head">
-              <span className="dui-panel-title">{t('dashboard.chartTariff')}</span>
-            </div>
-            <ResponsiveContainer width="100%" height={180}>
-              <BarChart data={peakData} margin={{ top: 4, right: 4, left: -18, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#eef1f6" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 10, fill: MUTED }} axisLine={{ stroke: '#dde3eb' }} />
-                <YAxis tick={{ fontSize: 10, fill: MUTED }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={tip} />
-                <Bar dataKey="cost" radius={[6, 6, 0, 0]} maxBarSize={52}>
-                  {peakData.map((_, i) => (
-                    <Cell key={i} fill={BAR_COLORS[i]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+      <section className="dui-grid-duo">
+        <div className="dui-panel">
+          <div className="dui-panel-head">
+            <span className="dui-panel-title">{t('dashboard.chartTariff')}</span>
           </div>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={peakData} margin={{ top: 4, right: 4, left: -18, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#eef1f6" vertical={false} />
+              <XAxis dataKey="name" tick={{ fontSize: 10, fill: MUTED }} axisLine={{ stroke: '#dde3eb' }} />
+              <YAxis tick={{ fontSize: 10, fill: MUTED }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={tip} />
+              <Bar dataKey="cost" radius={[6, 6, 0, 0]} maxBarSize={72}>
+                {peakData.map((_, i) => (
+                  <Cell key={i} fill={BAR_COLORS[i]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
 
-          <div className="dui-panel">
-            <div className="dui-panel-head">
-              <span className="dui-panel-title">{t('dashboard.chartSteg')}</span>
-            </div>
-            <div className="dui-tariff-line">
-              <span>{t('tariff.peak')}</span>
-              <span>{fmt(kpis?.peakCost, 4)} DT</span>
-            </div>
-            <div className="dui-tariff-line">
-              <span>{t('tariff.offPeak')}</span>
-              <span>{fmt(kpis?.offPeakCost, 4)} DT</span>
-            </div>
-            <div className="dui-bar-track">
-              <div className="dui-bar-fill" style={{ width: `${peakPct}%` }} />
-            </div>
-            <p style={{ margin: '0.75rem 0 0', fontSize: '0.75rem', color: MUTED }}>
-              {t('tariff.peakCostPct', { pct: fmt(peakPct, 0) })}
-            </p>
+        <div className="dui-panel">
+          <div className="dui-panel-head">
+            <span className="dui-panel-title">{t('dashboard.chartSteg')}</span>
           </div>
+          <div className="dui-tariff-line">
+            <span>{t('tariff.peak')}</span>
+            <span style={{ fontWeight: 700, color: NAVY }}>{fmt(kpis?.peakCost, 4)} DT</span>
+          </div>
+          <div className="dui-tariff-line">
+            <span>{t('tariff.offPeak')}</span>
+            <span style={{ fontWeight: 700, color: ORANGE }}>{fmt(kpis?.offPeakCost, 4)} DT</span>
+          </div>
+          <div className="dui-bar-track" style={{ marginTop: '0.5rem' }}>
+            <div className="dui-bar-fill" style={{ width: `${peakPct}%` }} />
+          </div>
+          <p style={{ margin: '0.75rem 0 0', fontSize: '0.75rem', color: MUTED }}>
+            {t('tariff.peakCostPct', { pct: fmt(peakPct, 0) })}
+          </p>
         </div>
       </section>
 

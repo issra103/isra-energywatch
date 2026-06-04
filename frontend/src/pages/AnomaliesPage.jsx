@@ -61,7 +61,6 @@ export default function AnomaliesPage() {
           <h1 className="dui-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <ShieldAlert size={22} color={ORANGE} /> {t('anomalies.title')}
           </h1>
-          <p className="dui-sub">{t('anomalies.subtitle')}</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
           {lastUpdate && (
