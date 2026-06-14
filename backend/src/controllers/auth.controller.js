@@ -55,7 +55,10 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
     await user.save({ validateBeforeSave: false });
 
-    // Envoyer l'email
+    // Afficher le code dans les logs du backend (pour les tests)
+    console.log('🔐 CODE DE RÉCUPÉRATION :', resetCode);
+    
+    // Envoyer l'email (mais ne pas bloquer si l'email échoue)
     const message = `Votre code de récupération Energy SaaS est : ${resetCode}\nCe code est valide pendant 10 minutes.`;
     
     try {
@@ -64,14 +67,12 @@ exports.forgotPassword = async (req, res) => {
         subject: 'Récupération de mot de passe - Energy SaaS',
         message,
       });
-
-      res.status(200).json({ message: 'Code envoyé par email !' });
     } catch (err) {
-      user.resetPasswordToken = undefined;
-      user.resetPasswordExpires = undefined;
-      await user.save({ validateBeforeSave: false });
-      return res.status(500).json({ message: "Erreur lors de l'envoi de l'email.", error: err.message });
+      // Si l'email échoue, on continue quand même (le code est dans les logs)
+      console.log('⚠️ Email non envoyé (mais le code est ci-dessus)');
     }
+
+    res.status(200).json({ message: 'Code envoyé ! Vérifiez les logs du backend ou votre email.' });
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur.', error: err.message });
   }

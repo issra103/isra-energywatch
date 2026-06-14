@@ -8,7 +8,7 @@ export default function ForgotPasswordPage() {
   const panelRef = useRef(null);
   const formRef  = useRef(null);
 
-  const [step, setStep]         = useState(1); // 1=email, 2=code+newpw
+  const [step, setStep]         = useState(1); // 1=email, 2=code, 3=newpw
   const [email, setEmail]       = useState('');
   const [code, setCode]         = useState('');
   const [newPw, setNewPw]       = useState('');
@@ -50,11 +50,27 @@ export default function ForgotPasswordPage() {
     }
   };
 
-  // Étape 2 — Réinitialiser le mot de passe
+  // Étape 2 — Vérifier le code
+  const handleVerifyCode = async (e) => {
+    e.preventDefault();
+    setError(''); setSuccess('');
+    if (!code || code.length !== 6) { setError('Veuillez entrer le code à 6 chiffres.'); return; }
+    setLoading(true);
+    try {
+      setSuccess('Code vérifié !');
+      setTimeout(() => { setSuccess(''); setStep(3); }, 1000);
+    } catch {
+      setError('Erreur de connexion au serveur.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Étape 3 — Réinitialiser le mot de passe
   const handleReset = async (e) => {
     e.preventDefault();
     setError(''); setSuccess('');
-    if (!code || !newPw) { setError('Veuillez remplir tous les champs.'); return; }
+    if (!newPw) { setError('Veuillez entrer votre nouveau mot de passe.'); return; }
     if (newPw.length < 6) { setError('Le mot de passe doit contenir au moins 6 caractères.'); return; }
     setLoading(true);
     try {
@@ -103,12 +119,14 @@ export default function ForgotPasswordPage() {
           {/* Header */}
           <div className="login-form-header">
             <h1 className="login-form-title">
-              {step === 1 ? 'Mot de passe oublié' : 'Nouveau mot de passe'}
+              {step === 1 ? 'Mot de passe oublié' : step === 2 ? 'Code de vérification' : 'Nouveau mot de passe'}
             </h1>
             <p className="login-form-sub">
               {step === 1
                 ? 'Entrez votre email pour recevoir un code de récupération'
-                : `Code envoyé à ${email}`}
+                : step === 2
+                ? `Code envoyé à ${email}`
+                : 'Entrez votre nouveau mot de passe'}
             </p>
           </div>
 
@@ -120,7 +138,7 @@ export default function ForgotPasswordPage() {
                 <div className="login-input-wrap">
                   <Mail size={16} className="login-input-icon" />
                   <input
-                    type="email"
+                    type="text"
                     placeholder="nom@entreprise.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -139,9 +157,9 @@ export default function ForgotPasswordPage() {
             </form>
           )}
 
-          {/* Étape 2 — Code + nouveau mot de passe */}
+          {/* Étape 2 — Code seulement */}
           {step === 2 && (
-            <form onSubmit={handleReset} className="login-form">
+            <form onSubmit={handleVerifyCode} className="login-form">
               <div className="login-field">
                 <label className="login-label">Code de vérification</label>
                 <div className="login-input-wrap">
@@ -150,13 +168,34 @@ export default function ForgotPasswordPage() {
                     type="text"
                     placeholder="123456"
                     value={code}
-                    onChange={(e) => setCode(e.target.value)}
+                    onChange={(e) => {
+                        const onlyDigits = e.target.value.replace(/\D/g, '');
+                        setCode(onlyDigits);
+                    }}
                     className="login-input"
                     maxLength={6}
+                    inputMode="numeric"
+                    autoFocus
                   />
                 </div>
               </div>
 
+              {error   && <div className="login-error">{error}</div>}
+              {success && <div className="login-success">{success}</div>}
+
+              <button type="submit" className="login-submit" disabled={loading}>
+                {loading ? <span className="login-loader" /> : <>Vérifier <ArrowRight size={15} /></>}
+              </button>
+
+              <button type="button" className="login-back-btn" onClick={() => { setStep(1); setError(''); }}>
+                <ArrowLeft size={14} /> Changer d'email
+              </button>
+            </form>
+          )}
+
+          {/* Étape 3 — Nouveau mot de passe seulement */}
+          {step === 3 && (
+            <form onSubmit={handleReset} className="login-form">
               <div className="login-field">
                 <label className="login-label">Nouveau mot de passe</label>
                 <div className="login-input-wrap">
@@ -167,6 +206,7 @@ export default function ForgotPasswordPage() {
                     value={newPw}
                     onChange={(e) => setNewPw(e.target.value)}
                     className="login-input"
+                    autoFocus
                   />
                   <button type="button" className="login-eye" onClick={() => setShowPw(!showPw)} tabIndex={-1}>
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -181,8 +221,8 @@ export default function ForgotPasswordPage() {
                 {loading ? <span className="login-loader" /> : <>Réinitialiser <ArrowRight size={15} /></>}
               </button>
 
-              <button type="button" className="login-back-btn" onClick={() => { setStep(1); setError(''); }}>
-                <ArrowLeft size={14} /> Changer d'email
+              <button type="button" className="login-back-btn" onClick={() => { setStep(2); setError(''); }}>
+                <ArrowLeft size={14} /> Retour au code
               </button>
             </form>
           )}

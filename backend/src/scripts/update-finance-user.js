@@ -6,7 +6,7 @@ const User = require('../models/User');
 
 const NEW_USER = {
   name:     'Finance',
-  email:    'finance@energywatch.com',
+  email:    'chikhaouiissra525@gmail.com',
   password: 'Finance@2026',
   role:     'admin',
 };
