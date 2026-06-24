@@ -4,33 +4,56 @@ import { getActiveTariff, updateTariff as updateTariffApi } from '../api/energyA
 import { useLanguage } from '../context/LanguageContext';
 
 const DEFAULT_TARIFFS = [
-  { labelKey: 'tariff.offPeakSlot', hoursKey: 'tariff.lowHours', rate: 0.150, tone: 'navy', key: 'heure_creuse', slotId: 'creuse' },
-  { labelKey: 'tariff.normalSlot', hoursKey: 'tariff.normalHours', rate: 0.250, tone: 'navy-dark', key: 'heure_pleine', slotId: 'normal_am' },
-  { labelKey: 'tariff.peakSlot', hoursKey: 'tariff.peakHours', rate: 0.350, tone: 'orange', key: 'heure_pleine', slotId: 'peak' },
-  { labelKey: 'tariff.normalEvening', hoursKey: 'tariff.eveningHours', rate: 0.250, tone: 'slate', key: 'heure_pleine', slotId: 'normal_pm' },
+  { labelKey: 'tariff.offPeakSlot', hoursKey: 'tariff.lowHours', rate: 0.150, tone: 'orange', key: 'heure_creuse', slotId: 'creuse' },
+  { labelKey: 'tariff.normalSlot', hoursKey: 'tariff.normalHours', rate: 0.250, tone: 'navy-dark', key: 'heure_pleine', slotId: 'pleine' },
 ];
 
 function TariffCard({ item, onSave }) {
   const { t, lang } = useLanguage();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(item.rate.toFixed(3)));
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!editing) setDraft(String(item.rate.toFixed(3)));
+    if (!editing) {
+      setDraft(String(item.rate.toFixed(3)));
+      setError('');
+    }
   }, [item.rate, lang, editing]);
 
-  const commit = () => {
-    const v = parseFloat(draft);
-    if (!isNaN(v) && v > 0) {
-      onSave(v);
-      setEditing(false);
+  const validate = (value) => {
+    if (!value || value.trim() === '') {
+      return 'Le tarif ne peut pas être vide.';
     }
+    const v = parseFloat(value);
+    if (isNaN(v)) {
+      return 'Veuillez entrer un nombre valide.';
+    }
+    if (v <= 0) {
+      return 'Le tarif doit être supérieur à 0.';
+    }
+    return '';
+  };
+
+  const commit = () => {
+    const validationError = validate(draft);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+    const v = parseFloat(draft);
+    onSave(v);
+    setEditing(false);
+    setError('');
   };
 
   const cancel = () => {
     setDraft(String(item.rate.toFixed(3)));
     setEditing(false);
+    setError('');
   };
+
+  const validationError = validate(draft);
 
   return (
     <article className={`dui-settings-card dui-settings-card--${item.tone}`}>
@@ -46,6 +69,7 @@ function TariffCard({ item, onSave }) {
             onClick={() => {
               setDraft(String(item.rate.toFixed(3)));
               setEditing(true);
+              setError('');
             }}
             aria-label={t('parametres.editTariff')}
           >
@@ -58,12 +82,15 @@ function TariffCard({ item, onSave }) {
         {editing ? (
           <div className="dui-settings-card-edit-row">
             <input
-              className="dui-settings-card-input"
+              className={`dui-settings-card-input ${validationError ? 'dui-input-error' : ''}`}
               type="number"
               step="0.001"
               min="0.001"
               value={draft}
-              onChange={(e) => setDraft(e.target.value)}
+              onChange={(e) => {
+                setDraft(e.target.value);
+                if (error) setError('');
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') commit();
                 if (e.key === 'Escape') cancel();
@@ -71,7 +98,12 @@ function TariffCard({ item, onSave }) {
               autoFocus
             />
             <span className="dui-settings-card-unit">DT/kWh</span>
-            <button type="button" onClick={commit} className="dui-settings-card-btn dui-settings-card-btn--ok">
+            <button 
+              type="button" 
+              onClick={commit} 
+              className={`dui-settings-card-btn dui-settings-card-btn--ok ${validationError ? 'dui-btn-disabled' : ''}`}
+              disabled={!!validationError}
+            >
               <Check size={14} />
             </button>
             <button type="button" onClick={cancel} className="dui-settings-card-btn">
@@ -84,6 +116,11 @@ function TariffCard({ item, onSave }) {
             <small> DT/kWh</small>
           </span>
         )}
+        {error && (
+          <p className="dui-error-message" style={{ color: '#dc2626', fontSize: '0.75rem', marginTop: '0.5rem' }}>
+            {error}
+          </p>
+        )}
       </div>
     </article>
   );
@@ -93,6 +130,7 @@ export default function Parametres() {
   const { lang, t } = useLanguage();
   const [tariffs, setTariffs] = useState(DEFAULT_TARIFFS);
   const [saved, setSaved] = useState(false);
+  const [globalError, setGlobalError] = useState('');
 
   const loadTariffs = useCallback(async () => {
     try {
@@ -115,17 +153,27 @@ export default function Parametres() {
 
   const updateTariff = (index, newRate) => {
     setTariffs((prev) => prev.map((row, i) => (i === index ? { ...row, rate: newRate } : row)));
+    setGlobalError('');
   };
 
   const handleSaveAll = async () => {
+    const creuse = tariffs.find((row) => row.key === 'heure_creuse')?.rate;
+    const pleine = tariffs.find((row) => row.key === 'heure_pleine')?.rate;
+
+    // Vérification uniquement au clic sur Appliquer
+    if (creuse <= 0 || pleine <= 0 || !creuse || !pleine) {
+      setGlobalError('Erreur : Tarifs invalides (>0).');
+      return;
+    }
+
     try {
-      const creuse = tariffs.find((row) => row.key === 'heure_creuse')?.rate || 0.15;
-      const pleine = tariffs.find((row) => row.slotId === 'normal_am')?.rate || 0.25;
+      setGlobalError('');
       await updateTariffApi({ heure_pleine: pleine, heure_creuse: creuse });
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
       console.error('Error saving tariffs:', err);
+      setGlobalError('Erreur lors de la sauvegarde des tarifs.');
     }
   };
 
@@ -144,7 +192,12 @@ export default function Parametres() {
             <CreditCard size={18} />
             <span>{t('parametres.tariffTitle')}</span>
           </div>
-          <button type="button" className="dui-btn-orange" onClick={handleSaveAll}>
+          <button 
+            type="button" 
+            className={`dui-btn-orange ${globalError ? 'dui-btn-disabled' : ''}`}
+            onClick={handleSaveAll}
+            disabled={!!globalError}
+          >
             {saved ? (
               <>
                 <Check size={14} /> {t('common.saved')}
@@ -160,6 +213,12 @@ export default function Parametres() {
             <TariffCard key={`${lang}-${row.slotId}`} item={row} onSave={(rate) => updateTariff(i, rate)} />
           ))}
         </div>
+
+        {globalError && (
+          <p style={{ color: '#dc2626', fontSize: '0.875rem', marginTop: '1rem', textAlign: 'center' }}>
+            {globalError}
+          </p>
+        )}
 
         <p className="dui-settings-hint">{t('parametres.tariffHint')}</p>
       </section>

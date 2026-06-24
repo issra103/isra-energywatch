@@ -240,6 +240,24 @@ exports.updateTariff = async (req, res) => {
   try {
     const { heure_pleine, heure_creuse } = req.body;
     
+    // Validation côté backend
+    const errors = [];
+    if (heure_pleine === undefined || heure_pleine === null || heure_pleine === '') {
+      errors.push('Le tarif heure pleine est requis.');
+    } else if (typeof heure_pleine !== 'number' || isNaN(heure_pleine) || heure_pleine <= 0) {
+      errors.push('Le tarif heure pleine doit être un nombre supérieur à 0.');
+    }
+    
+    if (heure_creuse === undefined || heure_creuse === null || heure_creuse === '') {
+      errors.push('Le tarif heure creuse est requis.');
+    } else if (typeof heure_creuse !== 'number' || isNaN(heure_creuse) || heure_creuse <= 0) {
+      errors.push('Le tarif heure creuse doit être un nombre supérieur à 0.');
+    }
+    
+    if (errors.length > 0) {
+      return res.status(400).json({ errors });
+    }
+    
     let tariff = await Tariff.findOne({ is_active: true });
     
     if (!tariff) {

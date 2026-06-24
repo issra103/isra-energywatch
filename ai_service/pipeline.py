@@ -10,11 +10,12 @@ from normalize_standardize import normalize_and_standardize
 from calculate_kpis import calculate_kpis
 from zone_analysis import analyze_by_zone
 from deep_exploration import deep_exploration
+from export_for_platform import export_for_platform
 
 def run_full_pipeline():
     """
     Exécution complète du pipeline d'analyse du dataset
-    de la section S1.1 à S1.7.
+    de la section S1.1 à S1.7 + Export pour la plateforme.
     """
     print("╔══════════════════════════════════════════════════════════════╗")
     print("║    PIPELINE D'ANALYSE COMPLET ENERGYWATCH                    ║")
@@ -40,6 +41,9 @@ def run_full_pipeline():
 
     # Étape 6 : Exploration approfondie (S1.7)
     deep_exploration()
+
+    # Étape 7 : Export pour la plateforme
+    export_for_platform()
 
     print("\n✅ PIPELINE COMPLETÉ AVEC SUCCÈS !")
     print("   Tous les fichiers sont générés.")
