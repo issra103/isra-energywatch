@@ -120,7 +120,7 @@ exports.me = async (req, res) => {
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
     if (!name || !email || !password)
       return res.status(400).json({ message: 'Nom, email et mot de passe requis.' });
@@ -129,7 +129,7 @@ exports.register = async (req, res) => {
     if (exists)
       return res.status(409).json({ message: 'Cet email est déjà utilisé.' });
 
-    const user  = await User.create({ name, email, password, role: role || 'viewer' });
+    const user  = await User.create({ name, email, password, role: 'responsable_financier' });
     const token = signToken(user);
 
     res.status(201).json({

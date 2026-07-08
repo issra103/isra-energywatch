@@ -8,7 +8,7 @@ const ADMIN = {
   name:     'Finance',
   email:    'finance@energywatch.com',
   password: 'Finance@2026',
-  role:     'admin',
+  role:     'responsable_financier',
 };
 
 async function seed() {

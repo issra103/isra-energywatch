@@ -8,7 +8,7 @@ const NEW_USER = {
   name:     'Finance',
   email:    'chikhaouiissra525@gmail.com',
   password: 'Finance@2026',
-  role:     'admin',
+  role:     'responsable_financier',
 };
 
 async function update() {
@@ -23,6 +23,7 @@ async function update() {
       user.name = NEW_USER.name;
       user.email = NEW_USER.email;
       user.password = NEW_USER.password; // Le modèle User hash le mot de passe automatiquement via pre-save
+      user.role = NEW_USER.role;
       await user.save();
       console.log(`[Update] User updated: ${NEW_USER.email} / ${NEW_USER.password}`);
     } else {
@@ -32,6 +33,7 @@ async function update() {
         console.log(`[Update] User created: ${NEW_USER.email} / ${NEW_USER.password}`);
       } else {
         existsNew.password = NEW_USER.password;
+        existsNew.role = NEW_USER.role;
         await existsNew.save();
         console.log(`[Update] Password updated for existing user: ${NEW_USER.email}`);
       }

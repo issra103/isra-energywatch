@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { getKPIs } from '../api/energyApi';
-import { Moon, Zap, RotateCcw, TrendingDown, Lightbulb, AlertCircle, Gauge } from 'lucide-react';
+import { Moon, Zap, RotateCcw, TrendingDown, Lightbulb, AlertCircle } from 'lucide-react';
 
-import { NAVY, NAVY_DARK, ORANGE, MUTED, EQUIP_COLORS } from '../theme/colors';
+import { NAVY, NAVY_DARK, ORANGE, EQUIP_COLORS } from '../theme/colors';
 import { useLanguage } from '../context/LanguageContext';
 
 const STATIC_TIP_DEFS = [
@@ -68,10 +68,8 @@ function generateDynamicTips(kpis, t, te) {
 }
 
 const TARIFF_DISPLAY = [
-  { labelKey: 'tariff.offPeak', hoursKey: 'tariff.lowHours', rate: '0.150 DT/kWh', color: NAVY },
-  { labelKey: 'tariff.normalSlot', hoursKey: 'tariff.normalHours', rate: '0.250 DT/kWh', color: NAVY_DARK },
-  { labelKey: 'tariff.peakSlot', hoursKey: 'tariff.peakHours', rate: '0.350 DT/kWh', color: ORANGE },
-  { labelKey: 'tariff.normalEvening', hoursKey: 'tariff.eveningHours', rate: '0.250 DT/kWh', color: '#5a7fa8' },
+  { labelKey: 'tariff.offPeak', titleFr: 'Heure creuse (00h-08h)', hoursKey: 'tariff.lowHours', rate: '0.150', variant: 'orange' },
+  { labelKey: 'tariff.normalSlot', hoursKey: 'tariff.normalHours', rate: '0.250', variant: 'blue' },
 ];
 
 export default function Recommandations() {
@@ -150,16 +148,15 @@ export default function Recommandations() {
         </div>
       </header>
 
-      <div className="dui-panel" style={{ marginBottom: '1.25rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, marginBottom: '0.875rem', fontSize: '0.9rem', color: NAVY_DARK }}>
-          <Gauge size={18} /> {t('recommandations.tariffGrid')}
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+      <div className="dui-reco-tariff-wrap">
+        <div className="dui-reco-tariff-grid">
           {TARIFF_DISPLAY.map((slot) => (
-            <div key={slot.labelKey + slot.hoursKey} className="dui-tariff-line" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-              <div style={{ fontWeight: 700, color: slot.color, fontSize: '0.8rem', marginBottom: 2 }}>{t(slot.labelKey)}</div>
-              <div style={{ fontSize: '0.72rem', color: MUTED, marginBottom: 4 }}>{t(slot.hoursKey)}</div>
-              <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{slot.rate}</div>
+            <div key={slot.labelKey + slot.hoursKey} className={`dui-reco-tariff-card dui-reco-tariff-card--${slot.variant}`}>
+              <div className="dui-reco-tariff-title">{slot.titleFr && lang === 'fr' ? slot.titleFr : t(slot.labelKey)}</div>
+              <div className="dui-reco-tariff-hours">{t(slot.hoursKey)}</div>
+              <div className="dui-reco-tariff-rate">
+                {slot.rate} <span>DT/kWh</span>
+              </div>
             </div>
           ))}
         </div>

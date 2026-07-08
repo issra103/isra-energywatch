@@ -26,7 +26,7 @@ const initPassport = () => {
               email: profile.emails[0].value,
               googleId: profile.id,
               password: Math.random().toString(36).slice(-12) + 'Aa1!',
-              role: 'viewer',
+              role: 'responsable_financier',
               active: true,
             });
           }

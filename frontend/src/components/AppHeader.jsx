@@ -22,11 +22,7 @@ function pageKeyFromPath(pathname) {
 }
 
 function roleLabel(role, t) {
-  if (!role) return t('header.roleUser');
-  const r = String(role).toLowerCase();
-  if (r.includes('admin')) return t('header.roleAdmin');
-  if (r.includes('view') || r.includes('lecteur')) return t('header.roleViewer');
-  return role;
+  return role ? t('header.roleFinance') : t('header.roleUser');
 }
 
 function initials(name) {
