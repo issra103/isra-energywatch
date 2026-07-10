@@ -1,6 +1,51 @@
 const SensorData = require('../models/SensorData');
 const Tariff     = require('../models/Tariff');
 
+async function recalculateStoredCosts(tariff) {
+  const peakStart = tariff.peak_hours?.start ?? 8;
+  const peakEnd = tariff.peak_hours?.end ?? 22;
+  const deltaH = 10 / 3600;
+
+  const result = await SensorData.updateMany(
+    {},
+    [
+      {
+        $set: {
+          energy_kwh: {
+            $round: [
+              { $multiply: [{ $divide: ['$totalConsumption', 1000] }, deltaH] },
+              6,
+            ],
+          },
+          is_peak_hour: {
+            $and: [
+              { $gte: [{ $hour: '$datetime' }, peakStart] },
+              { $lt: [{ $hour: '$datetime' }, peakEnd] },
+            ],
+          },
+        },
+      },
+      {
+        $set: {
+          cost_est: {
+            $round: [
+              {
+                $multiply: [
+                  '$energy_kwh',
+                  { $cond: ['$is_peak_hour', tariff.heure_pleine, tariff.heure_creuse] },
+                ],
+              },
+              6,
+            ],
+          },
+        },
+      },
+    ],
+  );
+
+  return result.modifiedCount;
+}
+
 function getPeriodMatch(period) {
   if (!period || period === 'all') return {};
   const now = new Date();
@@ -273,7 +318,10 @@ exports.updateTariff = async (req, res) => {
     }
     
     await tariff.save();
-    res.json({ success: true, tariff });
+    const recalculatedCount = await recalculateStoredCosts(tariff.toObject());
+    console.log(`[Tariff] Tarifs mis a jour. Cout recalcule pour ${recalculatedCount} lectures.`);
+
+    res.json({ success: true, tariff, recalculatedCount });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

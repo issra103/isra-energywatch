@@ -215,6 +215,7 @@ export const translations = {
       tariffTitle: 'Configuration tarifaire STEG',
       editTariff: 'Modifier le tarif',
       tariffHint: "Cliquez sur l'icône crayon pour modifier un tarif. Appuyez sur Entrée ou ✓ pour confirmer.",
+      recalculated: 'Tarifs enregistrés.',
     },
     recommandations: {
       title: 'Recommandations',
@@ -463,6 +464,7 @@ export const translations = {
       tariffTitle: 'STEG tariff configuration',
       editTariff: 'Edit rate',
       tariffHint: 'Click the pencil icon to edit a rate. Press Enter or ✓ to confirm.',
+      recalculated: 'Tariffs saved.',
     },
     recommandations: {
       title: 'Recommendations',

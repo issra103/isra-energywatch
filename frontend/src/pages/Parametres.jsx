@@ -131,6 +131,7 @@ export default function Parametres() {
   const [tariffs, setTariffs] = useState(DEFAULT_TARIFFS);
   const [saved, setSaved] = useState(false);
   const [globalError, setGlobalError] = useState('');
+  const [recalculatedCount, setRecalculatedCount] = useState(null);
 
   const loadTariffs = useCallback(async () => {
     try {
@@ -154,6 +155,7 @@ export default function Parametres() {
   const updateTariff = (index, newRate) => {
     setTariffs((prev) => prev.map((row, i) => (i === index ? { ...row, rate: newRate } : row)));
     setGlobalError('');
+    setRecalculatedCount(null);
   };
 
   const handleSaveAll = async () => {
@@ -168,12 +170,16 @@ export default function Parametres() {
 
     try {
       setGlobalError('');
-      await updateTariffApi({ heure_pleine: pleine, heure_creuse: creuse });
+      setRecalculatedCount(0);
       setSaved(true);
+      const result = await updateTariffApi({ heure_pleine: pleine, heure_creuse: creuse });
+      setRecalculatedCount(result.recalculatedCount ?? 0);
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
       console.error('Error saving tariffs:', err);
-      setGlobalError('Erreur lors de la sauvegarde des tarifs.');
+      setSaved(false);
+      setRecalculatedCount(null);
+      setGlobalError(err.response?.data?.error || 'Erreur lors de la sauvegarde des tarifs.');
     }
   };
 
@@ -218,6 +224,19 @@ export default function Parametres() {
           <p style={{ color: '#dc2626', fontSize: '0.875rem', marginTop: '1rem', textAlign: 'center' }}>
             {globalError}
           </p>
+        )}
+
+        {recalculatedCount !== null && !globalError && (
+          <>
+            <div className="dui-settings-saved">
+              <Check size={14} />
+              <span>{t('common.saved')}</span>
+            </div>
+            <div className="dui-settings-success">
+              <Check size={16} />
+              <span>{t('parametres.recalculated', { count: recalculatedCount })}</span>
+            </div>
+          </>
         )}
 
         <p className="dui-settings-hint">{t('parametres.tariffHint')}</p>

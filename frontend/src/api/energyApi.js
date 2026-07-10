@@ -35,5 +35,4 @@ export const getSimulatorStatus = ()             => api.get('/api/simulate/statu
 export const startSimulator     = ()             => api.post('/api/simulate/start').then(r => r.data);
 export const stopSimulator      = ()             => api.post('/api/simulate/stop').then(r => r.data);
 export const getActiveTariff     = ()             => api.get('/api/energy/tariffs').then(r => r.data);
-export const updateTariff        = (data)         => api.put('/api/energy/tariffs', data).then(r => r.data);
-
+export const updateTariff        = (data)         => api.put('/api/energy/tariffs', data, { timeout: 30000 }).then(r => r.data);

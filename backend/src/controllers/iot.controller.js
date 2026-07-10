@@ -34,6 +34,9 @@ exports.receiveData = async (req, res) => {
       try {
         const aiResult  = await analyzeWithAI({ ...req.body, datetime: doc.datetime, totalConsumption });
         const financial = await calculateCost(totalConsumption, doc.datetime);
+        console.log(
+          `[Finance] ${doc.type_equipement} | ${financial.energy_kwh} kWh | ${financial.cost_dt} DT | ${financial.tariff_type}`
+        );
 
         const predicted = aiResult.predicted_next_w || null;
 

@@ -11,10 +11,7 @@ function getTariffType(timestamp, tariff) {
   };
 }
 
-exports.calculateCost = async (power_w, timestamp) => {
-  const tariff = await Tariff.findOne({ is_active: true }).lean();
-  if (!tariff) throw new Error('Aucun tarif actif. Lance seed-tariffs.js');
-
+function calculateCostFromTariff(power_w, timestamp, tariff) {
   const delta_h    = SIMULATOR_INTERVAL_S / 3600;
   const energy_kwh = (power_w / 1000) * delta_h;
 
@@ -26,4 +23,13 @@ exports.calculateCost = async (power_w, timestamp) => {
     cost_dt:     parseFloat(cost_dt.toFixed(6)),
     tariff_type: tariffType,
   };
+}
+
+exports.calculateCost = async (power_w, timestamp) => {
+  const tariff = await Tariff.findOne({ is_active: true }).lean();
+  if (!tariff) throw new Error('Aucun tarif actif. Lance seed-tariffs.js');
+
+  return calculateCostFromTariff(power_w, timestamp, tariff);
 };
+
+exports.calculateCostFromTariff = calculateCostFromTariff;
